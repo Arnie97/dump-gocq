@@ -50,6 +50,10 @@ func dumpGoCQ(dbPath, jsonPath string) {
 }
 
 var (
+	rootPath        string
+	timezone        string
+	quiet           bool = true
+	cleanOutput     bool = false
 	searchResult    []string
 	parsedDatabases []ParsedDB
 )
@@ -70,7 +74,6 @@ func main() {
 
 	start := time.Now()
 
-	quiet = true
 	searchForDBs()
 	readDBs()
 	dumpGoCQ(rootPath, jsonPath)
