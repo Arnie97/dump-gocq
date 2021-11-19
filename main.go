@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
@@ -38,7 +39,14 @@ func dumpGoCQ(dbPath, jsonPath string) {
 			checkError(err)
 
 			var g map[string]interface{}
-			checkError(gob.NewDecoder(bytes.NewReader(v)).Decode(&g))
+			if err = gob.NewDecoder(bytes.NewReader(v)).Decode(&g); err != nil {
+				// legacy gzipped messages
+				if gzReader, gzErr := gzip.NewReader(bytes.NewReader(v)); gzErr == nil {
+					err = gob.NewDecoder(gzReader).Decode(&g)
+				}
+				checkError(err)
+			}
+
 			ret = append(ret, g)
 		}
 		encoder := json.NewEncoder(jsonFile)
