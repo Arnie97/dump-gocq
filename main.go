@@ -47,7 +47,25 @@ func dumpGoCQ(dbPath, jsonPath string) {
 				checkError(err)
 			}
 
-			ret = append(ret, g)
+			if g["group"] != 619047717 {
+				continue
+			}
+			if t, ok := g["time"].(float64); ok && t < 1638182816 {
+				continue
+			}
+			if s, ok := g["message"].(string); ok && s[:5] != "[CQ:i" {
+				continue
+			}
+			ret = append(ret, map[string]interface{}{
+				"message":  g["message"],
+				"group_id": g["group"],
+				"user_id":  257195552,
+				"self_id":  257195552,
+				"sender": map[string]interface{}{
+					"user_id": 257195552,
+					"title":   "",
+				},
+			})
 		}
 		encoder := json.NewEncoder(jsonFile)
 		encoder.SetIndent("", "\t")
